@@ -29,7 +29,7 @@ module.exports = {
 
 
         bot.onText(/\/add_cuntliment/, (msg, match) => {
-            var text = match.replace('\/add_cuntliment ', '');
+            var text = msg.text.replace('\/add_cuntliment ', '');
             mongodb.addCuntliment(text).then(res => {
                 bot.sendMessage(msg.chat.id, 'Спасибо, текст \"' + text + '\" успешно добавлен');
             });
@@ -57,6 +57,7 @@ function sendCuntlimentTo(chatId) {
     mongodb.getCuntliment().then(res => {
         console.log("sending cuntliment: " + res.text);
         bot.sendMessage(chatId, res.text, requestCuntlimentButton);
+
         // bot.setChatMenuButton({chat_id: chatId, })
         // bot.inline
     });
