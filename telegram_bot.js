@@ -20,12 +20,12 @@ module.exports = {
         //     { command: '/i_demand_attention', description: 'Давай еще' },
         // ]);
 
-        bot.onText(/Еще/, (msg, match) => {
+        bot.onText(/[еЕ]ще/, (msg, match) => {
             sendCuntlimentTo(msg.chat.id);
         });
-        // bot.onText(/\/i_demand_attention/, (msg, match) => {
-        //     sendCuntlimentTo(msg.chat.id);
-        // });
+        bot.onText(/\/i_demand_attention/, (msg, match) => {
+            sendCuntlimentTo(msg.chat.id);
+        });
 
 
         bot.onText(/\/add_cuntliment/, (msg, match) => {
