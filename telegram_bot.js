@@ -42,7 +42,7 @@ module.exports = {
 
             listenerReply = (async (replyHandler) => {
                 bot.removeReplyListener(listenerReply);
-                mongodb.suggestCompliment(replyHandler.text);
+                mongodb.suggestCompliment(replyHandler.text, msg.chat.username);
                 await bot.sendMessage(replyHandler.chat.id, `${replyHandler.text}\n
                 Звучит неплохо, золотце!🧐 А ты не только ебалом вышла 😏`, { "reply_markup": { "force_reply": false } })
             });
