@@ -20,8 +20,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
     db = mongoClient.db(dbName);
     collections = {
         everyday: db.collection('everyday'),
-        suggested: db.collection('suggested'),
-        adminModes: db.collection('admin_modes')
+        suggested: db.collection('suggested')
     }
     collections.everyday.createIndex({ "text": "text" });
 });
@@ -31,6 +30,19 @@ MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
 
 
 module.exports = {
+    init() {
+        return MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+            console.log(url);
+            console.log(err);
+            mongoClient = client;
+            db = mongoClient.db(dbName);
+            collections = {
+                everyday: db.collection('everyday'),
+                suggested: db.collection('suggested')
+            }
+            collections.everyday.createIndex({ "text": "text" });
+        });
+    },
     getCuntliment() {
         return new Promise((resolve, reject) => {
             var cursor = collections.everyday.aggregate([{ $sample: { size: 1 } }]);
@@ -39,7 +51,7 @@ module.exports = {
                 if (res) {
                     resolve(res);
                 } else {
-                    reject();
+                    reject(err);
                 }
             });
 
