@@ -51,14 +51,14 @@ module.exports = {
     },
 
     addCuntliment(text) {
-        return new Promise((resolve, reject) => collections.everyday.insert({ text: text }, (err, res) => {
+        return new Promise((resolve, reject) => collections.everyday.insertOne({ text: text }, (err, res) => {
             if (err) reject(err);
             else resolve(res);
         }));
     },
 
     suggestCompliment(text, username) {
-        return new Promise((resolve, reject) => collections.suggested.insert({ text: text, username: username }, (err, res) => {
+        return new Promise((resolve, reject) => collections.suggested.insertOne({ text: text, username: username }, (err, res) => {
             if (err) reject(err);
             else resolve(res);
         }));
