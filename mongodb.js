@@ -30,8 +30,9 @@ var collections = {
 
 
 module.exports = {
-    init() {
-        return MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+    async init() {
+        var client = await MongoClient.connect(url, { useUnifiedTopology: true });
+        if (!!client) {
             console.log(url);
             mongoClient = client;
             db = mongoClient.db(dbName);
@@ -40,7 +41,9 @@ module.exports = {
                 suggested: db.collection('suggested')
             }
             collections.everyday.createIndex({ "text": "text" });
-        });
+
+        }
+
     },
     getCuntliment() {
         return new Promise((resolve, reject) => {
