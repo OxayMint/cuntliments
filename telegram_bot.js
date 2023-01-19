@@ -1,7 +1,7 @@
 
 const TelegramBot = require('node-telegram-bot-api');
-const { removeSuggested } = require('./mongodb');
 const mongodb = require('./mongodb');
+const { ObjectId } = require('mongodb');
 
 const token = '5842425234:AAElCs43QWJ21ufpJ5ZrF2zrox9SPPv8Jjo';//@Cuntliments_bot
 
@@ -13,16 +13,21 @@ const allowedList = [
 ];
 module.exports = {
     init: () => {
+        bot.setMyCommands([
+            { command: '/add_cuntliment', description: 'Suggest your cuntliment' },
+        ]
+        );
         bot.on('callback_query', (query) => {
             console.log(JSON.stringify(query));
             if (query.data.startsWith('remove')) {
-                removeSuggested(query.data.replace('remove ', ''));
-                sendSuggestedTo(query.message.chat.id);
+                mongodb.removeSuggested(ObjectId(query.data.replace('remove ', '')));
             }
             else if (query.data.startsWith('promote')) {
-                moveSuggestedToEveryday(query.data.replace('promote ', ''));
-                sendSuggestedTo(query.message.chat.id);
+                mongodb.moveSuggestedToEveryday(ObjectId(query.data.replace('promote ', '')));
             }
+            //for now, while all the callback queries will be about suggested moderation, we can do it like this. can probably change this if this part expands
+            sendSuggestedTo(query.message.chat.id);
+            bot.deleteMessage(query.message.chat.id, query.message.message_id);
         });
         bot.onText(/\/start/, (msg, match) => {
             sendCuntlimentTo(msg.chat.id);
@@ -43,8 +48,7 @@ module.exports = {
             listenerReply = (async (replyHandler) => {
                 bot.removeReplyListener(listenerReply);
                 mongodb.suggestCompliment(replyHandler.text, msg.chat.username);
-                await bot.sendMessage(replyHandler.chat.id, `${replyHandler.text}\n
-                Звучит неплохо, золотце!🧐 А ты не только ебалом вышла 😏`, { "reply_markup": { "force_reply": false } })
+                await bot.sendMessage(replyHandler.chat.id, `${replyHandler.text}\nЗвучит неплохо, золотце!🧐 А ты не только ебалом вышла 😏`, { "reply_markup": { "force_reply": false } })
             });
 
             bot.onReplyToMessage(contentMessage.chat.id, contentMessage.message_id, listenerReply);
@@ -53,15 +57,10 @@ module.exports = {
         bot.onText(/[еЕ]ще/, (msg, match) => {
             sendCuntlimentTo(msg.chat.id);
         });
-        // bot.onText(/\/i_demand_attention/, (msg, match) => {
-        //     sendCuntlimentTo(msg.chat.id);
-        // });
-
-
 
         bot.onText(/\/cat_mode/, (msg, match) => {
             if (!allowedList.includes(msg.chat.username.toLowerCase())) {
-                bot.sendMessage(msg.chat.id, 'Люблю тебя, малышка, но тебе нельзя так делать');
+                bot.sendMessage(msg.chat.id, 'Люблю тебя, малыш, но тебе нельзя так делать');
                 return;
             }
             sendSuggestedTo(msg.chat.id);
@@ -102,10 +101,12 @@ function sendSuggestedTo(chatId) {
         bot.sendMessage(chatId, res.text, {
             "reply_markup": {
                 "inline_keyboard": [[
-                    { text: "😑", callback_data: "remove " + res.id },
-                    { text: "🤩", callback_data: "promote " + res.id },
+                    { text: "😑", callback_data: "remove " + res._id },
+                    { text: "🤩", callback_data: "promote " + res._id },
                 ]]
             }
         });
+    }).catch(err => {
+        bot.sendMessage(chatId, "предложек нет",);
     });
 }

@@ -47,10 +47,7 @@ module.exports = {
         });
     },
     getCuntlimentById(id) {
-        return collections.everyday.findOne({ _id: new ObjectId(id) }, (err, res) => {
-            if (err) reject(err);
-            else resolve(res);
-        });
+        return collections.everyday.findOne({ _id: id });
     },
 
     addCuntliment(text) {
@@ -69,7 +66,7 @@ module.exports = {
 
     getSuggestedCuntliment() {
         return new Promise((resolve, reject) => {
-            var cursor = collections.everyday.aggregate([{ $sample: { size: 1 } }]);
+            var cursor = collections.suggested.aggregate([{ $sample: { size: 1 } }]);
             cursor.next((err, res) => {
                 if (err) reject(err);
                 else resolve(res);
@@ -79,14 +76,12 @@ module.exports = {
         });
     },
     getSuggestedCuntlimentById(id) {
-        return collections.suggested.findOne({ _id: new ObjectId(id) }, (err, res) => {
-            if (err) reject(err);
-            else resolve(res);
-        });
+        return collections.suggested.findOne({ _id: id });
     },
 
     removeSuggested(id) {
-        return new Promise((resolve, reject) => collections.suggested.delete({ _id: new ObjectId(id) }, (err, res) => {
+        console.log(`deleting ${id}`);
+        return new Promise((resolve, reject) => collections.suggested.deleteOne({ _id: id }, (err, res) => {
             if (err) reject(err);
             else resolve(res);
         }));
@@ -95,7 +90,7 @@ module.exports = {
     moveSuggestedToEveryday(id) {
         this.getSuggestedCuntlimentById(id).then(suggested => {
             this.addCuntliment(suggested.text);
-            this.removeSuggested(suggested.id)
+            this.removeSuggested(suggested._id)
         });
     }
 }
