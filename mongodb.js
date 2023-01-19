@@ -13,17 +13,17 @@ var collections = {
     everyday: null,
     suggested: null
 };
-MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
-    console.log(url);
-    console.log(err);
-    mongoClient = client;
-    db = mongoClient.db(dbName);
-    collections = {
-        everyday: db.collection('everyday'),
-        suggested: db.collection('suggested')
-    }
-    collections.everyday.createIndex({ "text": "text" });
-});
+// MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+//     console.log(url);
+//     console.log(err);
+//     mongoClient = client;
+//     db = mongoClient.db(dbName);
+//     collections = {
+//         everyday: db.collection('everyday'),
+//         suggested: db.collection('suggested')
+//     }
+//     collections.everyday.createIndex({ "text": "text" });
+// });
 
 
 
@@ -33,7 +33,6 @@ module.exports = {
     init() {
         return MongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
             console.log(url);
-            console.log(err);
             mongoClient = client;
             db = mongoClient.db(dbName);
             collections = {
