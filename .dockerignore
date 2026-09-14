@@ -1,0 +1,7 @@
+.git
+.gitignore
+node_modules
+test.js
+cuntliments.agz
+.env
+**/.DS_Store
