@@ -2,10 +2,31 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DEFAULT_PATH = path.join(__dirname, 'data.json');
+const SEED_PATH = path.join(__dirname, 'data.json');
+const DEFAULT_PATH = process.env.DATA_PATH || SEED_PATH;
 
 let dataPath = DEFAULT_PATH;
 let data = { everyday: [], suggested: [] };
+
+function ensureDir(filePath) {
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+}
+
+function seedIfNeeded() {
+    if (fs.existsSync(dataPath)) {
+        return;
+    }
+    ensureDir(dataPath);
+    if (fs.existsSync(SEED_PATH) && path.resolve(SEED_PATH) !== path.resolve(dataPath)) {
+        fs.copyFileSync(SEED_PATH, dataPath);
+        return;
+    }
+    data = { everyday: [], suggested: [] };
+    save();
+}
 
 function load() {
     const raw = fs.readFileSync(dataPath, 'utf8');
@@ -30,15 +51,9 @@ function newId() {
 
 module.exports = {
     async init(filePath) {
-        if (filePath) {
-            dataPath = filePath;
-        }
-        if (!fs.existsSync(dataPath)) {
-            data = { everyday: [], suggested: [] };
-            save();
-        } else {
-            load();
-        }
+        dataPath = filePath || process.env.DATA_PATH || SEED_PATH;
+        seedIfNeeded();
+        load();
     },
 
     getCuntliment() {

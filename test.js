@@ -38,6 +38,14 @@ async function run() {
     await assert.rejects(() => storage.getSuggestedCuntliment(), /no suggested/);
 
     fs.unlinkSync(tempFile);
+
+    const seedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cuntliments-seed-'));
+    const seededPath = path.join(seedDir, 'nested', 'data.json');
+    await storage.init(seededPath);
+    const seeded = JSON.parse(fs.readFileSync(seededPath, 'utf8'));
+    assert.strictEqual(seeded.everyday.length, 47, 'missing data.json should be seeded from the bundled file');
+    fs.rmSync(seedDir, { recursive: true, force: true });
+
     console.log('ok');
 }
 
