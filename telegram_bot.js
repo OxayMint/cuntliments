@@ -1,7 +1,6 @@
 
 const TelegramBot = require('node-telegram-bot-api');
-const mongodb = require('./mongodb');
-const { ObjectId } = require('mongodb');
+const storage = require('./storage');
 
 const token = '5842425234:AAElCs43QWJ21ufpJ5ZrF2zrox9SPPv8Jjo';//@Cuntliments_bot
 
@@ -20,10 +19,10 @@ module.exports = {
         bot.on('callback_query', (query) => {
             console.log(JSON.stringify(query));
             if (query.data.startsWith('remove')) {
-                mongodb.removeSuggested(ObjectId(query.data.replace('remove ', '')));
+                storage.removeSuggested(query.data.replace('remove ', ''));
             }
             else if (query.data.startsWith('promote')) {
-                mongodb.moveSuggestedToEveryday(ObjectId(query.data.replace('promote ', '')));
+                storage.moveSuggestedToEveryday(query.data.replace('promote ', ''));
             }
             //for now, while all the callback queries will be about suggested moderation, we can do it like this. can probably change this if this part expands
             sendSuggestedTo(query.message.chat.id);
@@ -47,7 +46,7 @@ module.exports = {
 
             listenerReply = (async (replyHandler) => {
                 bot.removeReplyListener(listenerReply);
-                mongodb.suggestCompliment(replyHandler.text, msg.chat.username);
+                storage.suggestCompliment(replyHandler.text, msg.chat.username);
                 await bot.sendMessage(replyHandler.chat.id, `${replyHandler.text}\nЗвучит неплохо, золотце!🧐 А ты не только ебалом вышла 😏`, { "reply_markup": { "force_reply": false } })
             });
 
@@ -88,16 +87,18 @@ const requestCuntlimentButton = {
 
 
 function sendCuntlimentTo(chatId) {
-    mongodb.getCuntliment().then(res => {
+    storage.getCuntliment().then(res => {
         console.log("sending cuntliment: " + res.text);
         bot.sendMessage(chatId, res.text, requestCuntlimentButton);
         // bot.setChatMenuButton({chat_id: chatId, })
         // bot.inline
+    }).catch(() => {
+        bot.sendMessage(chatId, "пока пусто", requestCuntlimentButton);
     });
 }
 
 function sendSuggestedTo(chatId) {
-    mongodb.getSuggestedCuntliment().then(res => {
+    storage.getSuggestedCuntliment().then(res => {
         bot.sendMessage(chatId, res.text, {
             "reply_markup": {
                 "inline_keyboard": [[

@@ -1,7 +1,6 @@
 const telegram_bot = require("./telegram_bot");
-const mongodb = require('./mongodb');
+const storage = require('./storage');
 
-
-mongodb.init().then(client => {
+storage.init().then(() => {
     telegram_bot.init();
 });
