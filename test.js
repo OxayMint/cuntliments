@@ -12,7 +12,7 @@ async function run() {
     await storage.init(tempFile);
 
     const catalog = JSON.parse(fs.readFileSync(tempFile, 'utf8'));
-    assert.strictEqual(catalog.everyday.length, 47, 'expected 47 seeded answers');
+    assert.strictEqual(catalog.everyday.length, 100, 'expected 100 seeded answers');
 
     const seen = new Set();
     for (let i = 0; i < 40; i++) {
@@ -43,7 +43,7 @@ async function run() {
     const seededPath = path.join(seedDir, 'nested', 'data.json');
     await storage.init(seededPath);
     const seeded = JSON.parse(fs.readFileSync(seededPath, 'utf8'));
-    assert.strictEqual(seeded.everyday.length, 47, 'missing data.json should be seeded from the bundled file');
+    assert.strictEqual(seeded.everyday.length, 100, 'missing data.json should be seeded from the bundled file');
     fs.rmSync(seedDir, { recursive: true, force: true });
 
     console.log('ok');
